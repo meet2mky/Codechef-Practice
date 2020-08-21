@@ -45,24 +45,44 @@ using namespace std;
     int t;      \
     cin >> t;   \
     while (t--)
-//#define int long long
+#define int long long
 #define inf 0x3f3f3f3f
-int find(int i, vi &p)
+void dfs(int root, vi &a, vvi &g, vi &q, vector<bool> &vis, int d = 0, int evenId = -1, int oddId = -1)
 {
-    if (p[i] == i)
-        return i;
-    return p[i] = find(p[i], p);
-}
-void uni(int a, int b, vi &sz, vi &p)
-{
-    a = find(a, p);
-    b = find(b, p);
-    if (a != b)
+    vis[root] = true;
+    if (d && oddId != -1)
     {
-        if (sz[a] < sz[b])
-            swap(a, b);
-        p[b] = a;
-        sz[a] += sz[b];
+        a[oddId] += a[root];
+        a[root] = 0;
+    }
+    if (!d && evenId != -1)
+    {
+        a[evenId] += a[root];
+        a[root] = 0;
+    }
+
+    for (auto x : g[root])
+    {
+
+        if (!vis[x])
+        {
+            int tevenId = evenId, toddId = oddId;
+            if (tevenId == -1)
+            {
+                if (d == 0 && q[root])
+                {
+                    tevenId = root;
+                }
+            }
+            if (toddId == -1)
+            {
+                if (d == 1 && q[root])
+                {
+                    toddId = root;
+                }
+            }
+            dfs(x, a, g, q, vis, d ^ 1, tevenId, toddId);
+        }
     }
 }
 void solve()
@@ -71,60 +91,37 @@ void solve()
     cin >> t;
     while (t--)
     {
-        int n, m;
-        cin >> n >> m;
-        vi wi(n);
-        rep(i, 0, n) cin >> wi[i];
+        int n, qsz, u, v;
+        cin >> n >> qsz;
+        vvi g;
+        g.resize(n);
+        vi a(n);
         rep(i, 0, n)
         {
-            wi[i] = __builtin_popcount(wi[i]);
-            wi[i] = (wi[i] % 2 == 1);
+            cin >> a[i];
         }
-        vi p(n, -1);
-        vi sz(n, 0);
-        rep(i, 0, n)
-        {
-            sz[i] = 1;
-            p[i] = i;
-        }
-        int u, v;
-        rep(i, 0, m)
+        vi q(n);
+        rep(i, 1, n)
         {
             cin >> u >> v;
             u--;
             v--;
-            if (wi[u] == wi[v])
-                uni(u, v, sz, p);
+            g[u].push_back(v);
+            g[v].push_back(u);
         }
-        int oddmax = 0;
-        int evenmax = 0;
-        rep(i, 0, n)
+        while (qsz--)
         {
-            if (find(i, p) == i)
-            {
-                if (wi[i])
-                    oddmax = max(oddmax, sz[i]);
-                else
-                    evenmax = max(evenmax, sz[i]);
-            }
+            cin >> v;
+            v--;
+            q[v] = 1;
         }
-        int q, type, k;
-        cin >> q;
-        while (q--)
+        vector<bool> vis(n, false);
+        dfs(0, a, g, q, vis);
+        for (auto x : a)
         {
-            cin >> type >> k;
-            k = __builtin_popcount(k);
-            k = (k % 2 == 1);
-            type %= 2;
-            if (type == k)
-            {
-                cout << evenmax << '\n';
-            }
-            else
-            {
-                cout << oddmax << '\n';
-            }
+            cout << x << ' ';
         }
+        cout << '\n';
     }
 }
 signed main()

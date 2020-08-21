@@ -1,6 +1,4 @@
-max_even is: 1
-max_odd is: 2
-2
-2
 1
-1
+4
+4
+4

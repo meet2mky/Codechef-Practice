@@ -45,86 +45,50 @@ using namespace std;
     int t;      \
     cin >> t;   \
     while (t--)
-//#define int long long
+#define int long long
 #define inf 0x3f3f3f3f
-int find(int i, vi &p)
+const int N = 1000010;
+vi spf(N, -1);
+void sieve()
 {
-    if (p[i] == i)
-        return i;
-    return p[i] = find(p[i], p);
-}
-void uni(int a, int b, vi &sz, vi &p)
-{
-    a = find(a, p);
-    b = find(b, p);
-    if (a != b)
+    rep(i, 0, N) spf[i] = i;
+    for (int i = 2; i * i < N; i++)
     {
-        if (sz[a] < sz[b])
-            swap(a, b);
-        p[b] = a;
-        sz[a] += sz[b];
+        if (spf[i] == i)
+        {
+            for (int j = i * i; j < N; j += i)
+            {
+                spf[j] = i;
+            }
+        }
     }
 }
 void solve()
 {
+    sieve();
     int t;
     cin >> t;
     while (t--)
     {
-        int n, m;
-        cin >> n >> m;
-        vi wi(n);
-        rep(i, 0, n) cin >> wi[i];
-        rep(i, 0, n)
+        map<int, int> mp;
+        int n;
+        cin >> n;
+        while (n--)
         {
-            wi[i] = __builtin_popcount(wi[i]);
-            wi[i] = (wi[i] % 2 == 1);
-        }
-        vi p(n, -1);
-        vi sz(n, 0);
-        rep(i, 0, n)
-        {
-            sz[i] = 1;
-            p[i] = i;
-        }
-        int u, v;
-        rep(i, 0, m)
-        {
-            cin >> u >> v;
-            u--;
-            v--;
-            if (wi[u] == wi[v])
-                uni(u, v, sz, p);
-        }
-        int oddmax = 0;
-        int evenmax = 0;
-        rep(i, 0, n)
-        {
-            if (find(i, p) == i)
+            int var;
+            cin >> var;
+            while (var > 1)
             {
-                if (wi[i])
-                    oddmax = max(oddmax, sz[i]);
-                else
-                    evenmax = max(evenmax, sz[i]);
+                mp[spf[var]]++;
+                var /= spf[var];
             }
         }
-        int q, type, k;
-        cin >> q;
-        while (q--)
+        int ans = 1;
+        for (auto x : mp)
         {
-            cin >> type >> k;
-            k = __builtin_popcount(k);
-            k = (k % 2 == 1);
-            type %= 2;
-            if (type == k)
-            {
-                cout << evenmax << '\n';
-            }
-            else
-            {
-                cout << oddmax << '\n';
-            }
+            ans *= (x.second + 1);
         }
+        cout << ans << '\n';
     }
 }
 signed main()
