@@ -32,7 +32,6 @@ using namespace std;
 #define all(x) (x).begin(), (x).end()
 #define setall(x, val) fill(all(x), val)
 #define pb push_back
-#define mp make_pair
 #define vb vector<bool>
 #define vi vector<int>
 #define vvi vector<vi>
@@ -47,15 +46,16 @@ using namespace std;
     cin >> t;   \
     while (t--)
 
-//#define int long long
+#define int long long
 #define inf 0x3f3f3f3f
-
+#define linf 0x3f3f3f3f3f3f3f3f
 //variadic functions
 template <typename T>
 T sum() { return 0; }
 template <typename T, typename... Args>
 T sum(T a, Args... args) { return a + sum(args...); }
 
+//Debugger  -------------------------------------------->
 #define error(args...)                           \
     {                                            \
         string _s = #args;                       \
@@ -74,32 +74,46 @@ void err(istream_iterator<string> it, T a, Args... args)
     cerr << *it << " = " << a << endl;
     err(++it, args...);
 }
+//Debugger  <--------------------------------------------
 
 void solve()
 {
     int n;
+    error("what is this?");
     while (cin >> n)
     {
-        vvi modsum(n + 1, vi(n + 1, 0));
-        vvi cost(n + 1, vi(n + 1, 0));
-        rep(i, 1, n + 1)
+        error(n);
+        vi a(n);
+        rep(i, 0, n) cin >> a[i];
+        vvi cost(n, vi(n, linf)), elem(n, vi(n, 0));
+        rep(i, 0, n)
         {
-            cin >> modsum[i][i];
-        }
-        rep(i, 1, n + 1)
-        {
-            rep(j, i + 1, n + 1)
+            cost[i][i] = 0;
+            rep(j, i, n)
             {
-                modsum[i][j] = (modsum[i][j - 1] + modsum[j][j]) % 100;
+                if (i == j)
+                    elem[i][i] = a[i];
+                else
+                {
+                    elem[i][j] = (elem[i][j - 1] + a[j]) % 100;
+                }
             }
         }
-        rep(i, 2, n + 1)
+        error("are you serious?");
+        rep(l, 1, n)
         {
-            rep(j, 0, i)
+            rep(i, 0, n)
             {
-                cost[i]
+                int j = i + l;
+                if (j >= n)
+                    continue;
+                rep(k, i, j)
+                {
+                    cost[i][j] = min(cost[i][k] + cost[k + 1][j] + elem[i][k] * elem[k + 1][j], cost[i][j]);
+                }
             }
         }
+        cout << cost[0][n - 1] << '\n';
     }
 }
 
