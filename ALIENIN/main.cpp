@@ -19,6 +19,7 @@ Institue:- NITA
 #include <cassert>
 #include <cctype>
 #include <stack>
+#include <iomanip>
 #include <ctime>
 #include <iterator>
 #include <sstream>
@@ -41,12 +42,13 @@ using namespace std;
 #define ll long long
 #define ld long double
 #define SZ(z) (int)(z).size()
+#define eps 0.0000001
 #define test(t) \
     int t;      \
     cin >> t;   \
     while (t--)
 
-#define int long long
+//#define int long long
 #define inf 0x3f3f3f3f
 #define linf 0x3f3f3f3f3f3f3f3f
 //variadic functions
@@ -75,40 +77,53 @@ void err(istream_iterator<string> it, T a, Args... args)
     err(++it, args...);
 }
 //Debugger  <--------------------------------------------
-vector<int> memo;
-const int M = 1e9 + 7;
-int countDecoding(string &digits, int n)
+bool ok(vector<ld> &arr, ld time_to_reset, ld d)
 {
-
-    if (n == 0 || n == 1)
-        return memo[n] = 1;
-    if (digits[0] == '0')
-        return memo[n] = 0;
-
-    if (memo[n] != -1)
-        return memo[n];
-    int count = 0;
-    if (digits[n - 1] > '0')
-        count = countDecoding(digits, n - 1);
-
-    if (digits[n - 2] == '1' ||
-        (digits[n - 2] == '2' && digits[n - 1] < '7'))
-        count = (count + countDecoding(digits, n - 2)) % M;
-
-    return memo[n] = count;
+    ld last_use = -1e10;
+    rep(i, 0, SZ(arr))
+    {
+        if (last_use + time_to_reset < (arr[i] + d))
+        {
+            last_use = max(arr[i], last_use + time_to_reset);
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
 }
 void solve()
 {
-    test(zzzz)
+    test(zzz)
     {
-        string digits;
-        cin >> digits;
-        int n = SZ(digits);
-        memo.resize(n + 1);
-        setall(memo, -1);
-        cout << countDecoding(digits, SZ(digits)) << '\n';
+        int n;
+        ld d;
+        cin >> n >> d;
+        vector<ld> arr(n);
+        for (auto &x : arr)
+        {
+            cin >> x;
+        }
+        sort(all(arr));
+        ld l = 0.0;
+        ld r = 1e10;
+        while ((r - l) > eps)
+        {
+            ld mid = (r + l) / 2.0;
+            if (ok(arr, mid, d))
+            {
+                l = mid;
+            }
+            else
+            {
+                r = mid;
+            }
+        }
+        cout << fixed << setprecision(10) << l << '\n';
     }
 }
+
 signed main()
 {
     sync;
