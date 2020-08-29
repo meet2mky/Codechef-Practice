@@ -46,7 +46,7 @@ using namespace std;
     cin >> t;   \
     while (t--)
 
-#define int long long
+//#define int long long
 #define inf 0x3f3f3f3f
 #define linf 0x3f3f3f3f3f3f3f3f
 //variadic functions
@@ -75,40 +75,61 @@ void err(istream_iterator<string> it, T a, Args... args)
     err(++it, args...);
 }
 //Debugger  <--------------------------------------------
-vector<int> memo;
-const int M = 1e9 + 7;
-int countDecoding(string &digits, int n)
-{
 
-    if (n == 0 || n == 1)
-        return memo[n] = 1;
-    if (digits[0] == '0')
-        return memo[n] = 0;
-
-    if (memo[n] != -1)
-        return memo[n];
-    int count = 0;
-    if (digits[n - 1] > '0')
-        count = countDecoding(digits, n - 1);
-
-    if (digits[n - 2] == '1' ||
-        (digits[n - 2] == '2' && digits[n - 1] < '7'))
-        count = (count + countDecoding(digits, n - 2)) % M;
-
-    return memo[n] = count;
-}
 void solve()
 {
-    test(zzzz)
+    test(zzz)
     {
-        string digits;
-        cin >> digits;
-        int n = SZ(digits);
-        memo.resize(n + 1);
-        setall(memo, -1);
-        cout << countDecoding(digits, SZ(digits)) << '\n';
+        int n;
+        cin >> n;
+        vi a(n);
+        rep(i, 0, n)
+        {
+            cin >> a[i];
+            a[i]++;
+            a[i] %= n;
+        }
+        int res = 0;
+        vb blocked(n, false);
+        rep(i, 0, n)
+        {
+            if (!blocked[i])
+            {
+                int curr = i;
+                map<int, int> seen;
+                seen[i] = 1;
+                vi here = {i};
+                while (seen[(curr + a[curr]) % n] == 0 && blocked[(curr + a[curr]) % n] == false)
+                {
+                    curr += a[curr];
+                    curr %= n;
+                    seen[curr] = 1;
+                    here.pb(curr);
+                }
+                curr += a[curr];
+                curr %= n;
+
+                if (seen[curr] == 1)
+                {
+                    rep(j, 0, SZ(here))
+                    {
+                        if (here[j] == curr)
+                        {
+                            res += SZ(here) - j;
+                            break;
+                        }
+                    }
+                }
+                for (auto x : seen)
+                {
+                    blocked[x.first] = true;
+                }
+            }
+        }
+        cout << res << '\n';
     }
 }
+
 signed main()
 {
     sync;
